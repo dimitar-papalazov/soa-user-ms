@@ -1,0 +1,16 @@
+swagger: '2.0'
+info:
+  title: User MS
+  version: "0.1"
+  description: USER MS
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: "/api"
+//TODO
+paths:
+  
+//TODO
+parameters:
+  
