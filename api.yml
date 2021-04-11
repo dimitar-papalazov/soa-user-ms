@@ -37,7 +37,7 @@ paths:
         tags: [User]
         operationId: app.getUserDetails
         parameters:
-          -$ref: '#/paramters/user_id'
+          -$ref: '#/parameters/user_id'
         responses:
           200:
             description: Return user details
@@ -48,7 +48,7 @@ paths:
          tags: [User]
          operationId: app.getUserImages
            parameters:
-             -$ref: '#/paramters/user_id'
+             -$ref: '#/parameters/user_id'
          responses:
            200:
              description: Return user images
@@ -59,7 +59,7 @@ paths:
           tags: [User]
           operationId: app.addImageToUser
             parameters:
-              -$ref: '#/paramters/image_body'
+              -$ref: '#/parameters/image_body'
           responses:
             200:
               description: Added image to user
@@ -70,7 +70,7 @@ paths:
           tags: [User]
           operationId: app.changePassword
             parameters:
-              -$ref: '#/paramters/password_body'
+              -$ref: '#/parameters/password_body'
           responses:
             200:
               description: Changed password successfully
@@ -81,7 +81,7 @@ paths:
         tags: [User]
         operationId: app.changeGender
           parameters:
-            -$ref: '#/paramters/gender_body'
+            -$ref: '#/parameters/gender_body'
         responses:
           200:
             description: Changed gender successfully
@@ -92,7 +92,7 @@ paths:
         tags: [User]
         operationId: app.changeAge
           parameters:
-            -$ref: '#/paramters/age_body'
+            -$ref: '#/parameters/age_body'
         responses:
           200:
             description: Changed age successfully
@@ -103,7 +103,7 @@ paths:
           tags: [User]
           operationId: app.changePhone
             parameters:
-              -$ref: '#/paramters/phone_body'
+              -$ref: '#/parameters/phone_body'
           responses:
             200:
               description: Changed phone successfully
@@ -114,7 +114,7 @@ paths:
           tags: [User]
           operationId: app.changeCity
             parameters:
-              -$ref: '#/paramters/city_body'
+              -$ref: '#/parameters/city_body'
           responses:
             200:
               description: Changed city successfully
@@ -125,7 +125,7 @@ paths:
           tags: [User]
           operationId: app.changeCountry
             parameters:
-              -$ref: '#/paramters/country_body'
+              -$ref: '#/parameters/country_body'
           responses:
             200:
               description: Country changed successfully
@@ -136,7 +136,7 @@ paths:
           tags: [User]
           operationId: app.changeAddress
             parameters:
-              -$ref: '#/paramters/address_body'
+              -$ref: '#/parameters/address_body'
           responses:
             200:
               description: Address changed successfully
@@ -147,7 +147,7 @@ paths:
           tags: [User]
           operationId: app.changePostalCode
             parameters:
-              -$ref: '#/paramters/postal_body'
+              -$ref: '#/parameters/postal_body'
           responses:
             200:
               description: Postal code changed successfully
@@ -155,3 +155,81 @@ paths:
               description: Postal code not changed
 
 parameters:
+  user_body:
+    name: user_body
+    description: Body of a user
+    in: body
+    type: string
+    schema:
+      required:
+        -username
+        properties:
+          username:
+            type: string
+          name:
+            type: string
+          surname:
+            type: string
+          email:
+            type: string
+          password:
+            type: string
+  user_id:
+    name: user_id
+    description: User unique id
+    in: path
+    type: string
+
+  image_body:
+    name: image_body
+    description: Body of a image
+    in: body
+    type: string
+
+  password_body:
+    name: password_body
+    description: Body of a password
+    in: body
+    type: string
+
+  gender_body:
+    name: gender_body
+    description: Body of a gender
+    in: body
+    type: string
+
+  age_body:
+    name: age_body
+    description: Body of a age
+    in: body
+    type: string
+
+  phone_body:
+    name: phone_body
+    description: Body of a phone
+    in: body
+    type: string
+
+  city_body:
+    name: city_body
+    description: Body of a city
+    in: body
+    type: string
+
+  country_body:
+    name: country_body
+    description: Body of a country
+    in: body
+    type: string
+
+  address_body:
+    name: address_body
+    description: Body of an address
+    in: body
+    type: string
+
+  postal_body:
+    name: postal_body
+    description: Body of a postalCode
+    in: body
+    type: string
