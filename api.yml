@@ -7,10 +7,151 @@ consumes:
   - application/json
 produces:
   - application/json
-basePath: "/api"
-//TODO
+basePath: "/api/user"
+
 paths:
-  
-//TODO
+   /registration:
+    post:
+      tags: [User]
+      operationId: app.registration
+      parameters:
+          -$ref: '#/parameters/user_body'
+      responses:
+        200:
+          description: Return status
+        404:
+          description: Already exists
+   /getRole/{user_id}:
+     get:
+       tags: [User]
+       operationId: app.getRole
+       parameters:
+         -$ref: '#/parameters/user_id'
+       responses:
+         200:
+           description: Return user role
+         404:
+           description: User not found
+    /getUserDetails/{user_id}:
+      get:
+        tags: [User]
+        operationId: app.getUserDetails
+        parameters:
+          -$ref: '#/paramters/user_id'
+        responses:
+          200:
+            description: Return user details
+          404:
+            description: User not found
+     /getUserImages/{user_id}:
+       get:
+         tags: [User]
+         operationId: app.getUserImages
+           parameters:
+             -$ref: '#/paramters/user_id'
+         responses:
+           200:
+             description: Return user images
+           404:
+             description: User not found
+      /addImageToUser:
+        put:
+          tags: [User]
+          operationId: app.addImageToUser
+            parameters:
+              -$ref: '#/paramters/image_body'
+          responses:
+            200:
+              description: Added image to user
+            404:
+              description: Image not added
+      /changePassword:
+        put:
+          tags: [User]
+          operationId: app.changePassword
+            parameters:
+              -$ref: '#/paramters/password_body'
+          responses:
+            200:
+              description: Changed password successfully
+            404:
+              description: Password not changed
+      /changeGender:
+        put:
+        tags: [User]
+        operationId: app.changeGender
+          parameters:
+            -$ref: '#/paramters/gender_body'
+        responses:
+          200:
+            description: Changed gender successfully
+          404:
+            description: Gender not changed
+      /changeAge:
+        put:
+        tags: [User]
+        operationId: app.changeAge
+          parameters:
+            -$ref: '#/paramters/age_body'
+        responses:
+          200:
+            description: Changed age successfully
+          404:
+            description: Age not changed
+      /changePhone:
+        put:
+          tags: [User]
+          operationId: app.changePhone
+            parameters:
+              -$ref: '#/paramters/phone_body'
+          responses:
+            200:
+              description: Changed phone successfully
+            404:
+              description: Phone not changed
+      /changeCity:
+        put:
+          tags: [User]
+          operationId: app.changeCity
+            parameters:
+              -$ref: '#/paramters/city_body'
+          responses:
+            200:
+              description: Changed city successfully
+            404:
+              description: City not changed
+      /changeCountry:
+        put:
+          tags: [User]
+          operationId: app.changeCountry
+            parameters:
+              -$ref: '#/paramters/country_body'
+          responses:
+            200:
+              description: Country changed successfully
+            404:
+              description: Country not changed
+      /changeAddress:
+        put:
+          tags: [User]
+          operationId: app.changeAddress
+            parameters:
+              -$ref: '#/paramters/address_body'
+          responses:
+            200:
+              description: Address changed successfully
+            404:
+              description: Address not changed
+      /changePostalCode:
+        put:
+          tags: [User]
+          operationId: app.changePostalCode
+            parameters:
+              -$ref: '#/paramters/postal_body'
+          responses:
+            200:
+              description: Postal code changed successfully
+            404:
+              description: Postal code not changed
+
 parameters:
-  
