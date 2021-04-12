@@ -17,10 +17,10 @@ class User(db.Model):
     country = db.Column(db.String)
     address = db.Column(db.String)
     postal_code = db.Column(db.Integer)
-    date_of_birth = db.Column(db.Integer)
-    images = db.Column(db.ARRAY(db.Integer))
+    date_of_birth = db.Column(db.String)
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
     is_profile = db.Column(db.Boolean, nullable=False)
