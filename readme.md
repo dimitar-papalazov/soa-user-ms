@@ -18,6 +18,6 @@
 
 ## Docker build & run
 - Build
-  - docker build -t my-app .
+  - docker build -t userms .
 - Run
-  - docker run -p 5000:5000 my-app
+  - docker run -p 5000:5000 userms
