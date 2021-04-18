@@ -44,7 +44,7 @@ paths:
         404:
           description: User not found
   /send-email/{user_id}:
-    get:
+    post:
       tags: [User]
       operationId: app.sendVerificationEmail
       parameters:
@@ -69,7 +69,7 @@ paths:
           description: User not found
   /images/{user_id}:
     get:
-      tags: [User]
+      tags: [Image]
       operationId: app.getUserImages
       parameters:
         - $ref: '#/parameters/user_id'
@@ -80,7 +80,7 @@ paths:
           description: User not found
   /add-image:
     post:
-      tags: [User]
+      tags: [Image]
       operationId: app.addImageToUser
       parameters:
         - $ref: '#/parameters/image_body'
@@ -100,28 +100,6 @@ paths:
           description: Changed password successfully
         404:
           description: Password not changed
-  /change-gender:
-    put:
-      tags: [User]
-      operationId: app.changeGender
-      parameters:
-        - $ref: '#/parameters/gender_body'
-      responses:
-        200:
-          description: Changed gender successfully
-        404:
-          description: Gender not changed
-  /change-age:
-    put:
-      tags: [User]
-      operationId: app.changeAge
-      parameters:
-        - $ref: '#/parameters/age_body'
-      responses:
-        200:
-          description: Changed age successfully
-        404:
-          description: Age not changed
   /change-phone:
     put:
       tags: [User]
@@ -177,17 +155,37 @@ paths:
           description: Postal code changed successfully
         404:
           description: Postal code not changed
-  /change-birth:
-    put:
+  /all:
+    get:
       tags: [User]
-      operationId: app.changeDateOfBirth
-      parameters:
-        - $ref: '#/parameters/birth_body'
+      operationId: app.getAllUsers
       responses:
         200:
-          description: Date Of Birth changed successfully
+          description: Returns all users details
+        500:
+          description: Server error
+  /delete/{user_id}:
+    delete:
+      tags: [User]
+      operationId: app.deleteUser
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: User successfully deleted
         404:
-          description: Date Of Birth code not changed
+          description: User not found
+  /delete-image/{image_id}:
+    delete:
+      tags: [Image]
+      operationId: app.deleteImage
+      parameters:
+        - $ref: '#/parameters/image_id'
+      responses:
+        200:
+          description: Image successfully deleted
+        404:
+          description: Image not found
 
 parameters:
   user_body:
@@ -202,6 +200,8 @@ parameters:
         - email
         - password
         - repeatedPassword
+        - dateOfBirth
+        - gender
       properties:
         username:
           type: string
@@ -215,9 +215,20 @@ parameters:
           type: string
         repeatedPassword:
           type: string
+        dateOfBirth:
+          type: string
+        gender:
+          type: string
   user_id:
     name: user_id
     description: User unique id
+    in: path
+    type: integer
+    required: true
+
+  image_id:
+    name: image_id
+    description: Image unique id
     in: path
     type: integer
     required: true
@@ -255,34 +266,6 @@ parameters:
           type: string
         oldPassword:
           type: string
-
-  gender_body:
-    name: gender_body
-    description: Body of a gender
-    in: body
-    schema:
-      required:
-        - user_id
-        - gender
-      properties:
-        user_id:
-          type: integer
-        gender:
-          type: string
-
-  age_body:
-    name: age_body
-    description: Body of a age
-    in: body
-    schema:
-      required:
-        - user_id
-        - age
-      properties:
-        user_id:
-          type: integer
-        age:
-          type: integer
 
   phone_body:
     name: phone_body
@@ -354,20 +337,6 @@ parameters:
         postalCode:
           type: integer
 
-  birth_body:
-    name: birth_body
-    description: Body of a dateOfBirth
-    in: body
-    schema:
-      required:
-        - user_id
-        - birth
-      properties:
-        user_id:
-          type: integer
-        birth:
-          type: string
-
   verification_body:
     name: verification_body
     description: Body of a verificaiton
@@ -380,4 +349,4 @@ parameters:
         user_id:
           type: integer
         code:
-          type: integer
+          type: string

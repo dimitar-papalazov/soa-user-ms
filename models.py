@@ -1,6 +1,8 @@
 from app import db
 
+
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
@@ -19,8 +21,11 @@ class User(db.Model):
     postal_code = db.Column(db.Integer)
     date_of_birth = db.Column(db.String)
 
+
 class Image(db.Model):
+    __tablename__ = 'image'
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String, nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User")
     is_profile = db.Column(db.Boolean, nullable=False)
