@@ -71,7 +71,7 @@ def auth(auth_body):
         "exp": int(timestamp + JWT_LIFETIME_SECONDS),
         "sub": user_id,
         "roles": roles,
-        "user-details": (found_user)
+        "user-details": user_schema.dump(found_user)
     }
     encoded = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return encoded
@@ -103,42 +103,24 @@ def decode_token(token):
     return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
 
 
-#def user_to_json(user):
-#    return {
-#        'id': user.id,
-#        'email': user.email,
-#        'name': user.name,
-#        'surname': user.surname,
-#        'gender': user.gender,
-#        'age': user.age,
-#        'phone': user.phone,
-#        'city': user.city,
-#        'country': user.country,
-#        'address': user.address,
-#        'postalCode': user.postal_code,
-#        'isAdmin': user.is_admin,
-#        'dateOfBirth': user.date_of_birth
-#    }
-
-
 #endpoints
-def sendVerificationEmail(user_id):
+def send_verification_email(user_id):
   found_user = db.session.query(User).get(user_id)
   if found_user:
       msg = Message('Hello', sender = 'soauserms@gmail.com', recipients = [found_user.email])
       msg.subject='Verification Code For Your Account'
       msg.body = "Dear "+str(found_user.name)+" "+str(found_user.surname)+",\n" + "Your verificaiton code is: " + str(found_user.verification_code)
       mail.send(msg)
-      return {'message': "Successfully sent!"}
+      return 200
   else:
-      return {'error': '{} not found'.format(user_id)}, 404
+      return 404
 
 # TODO: da se dodaj gender i date of birth
 def registration(user_body):
     found_user = db.session.query(User).filter_by(username=user_body['username']).first()
     if not found_user:
-        if user_body['password'] == user_body['repeatedPassword']:
-            date_of_birth = datetime.strptime(user_body['dateOfBirth'], '%m-%d-%Y')
+        if user_body['password'] == user_body['repeated_password']:
+            date_of_birth = datetime.strptime(user_body['date_of_birth'], '%m-%d-%Y')
             today = date.today()
             age = relativedelta(today, date_of_birth).years
             letter_and_digits = string.ascii_letters + string.digits
@@ -146,52 +128,48 @@ def registration(user_body):
             new_user = User(username=user_body['username'],
             email=user_body['email'], name=user_body['name'],
             surname=user_body['surname'], password=bcrypt.generate_password_hash(user_body['password']),
-            is_admin=False, is_verified=False, date_of_birth=user_body['dateOfBirth'],
+            is_admin=False, is_verified=False, date_of_birth=user_body['date_of_birth'],
              gender=user_body['gender'], age=age, verification_code=code)
         else:
-            return {'error': '{} passwords do not match'.format(user_body['username'])}, 400
+            return 400
     else:
-        return {'error': '{} already exists'.format(user_body['username'])}, 409
+        return 409
     db.session.add(new_user)
     db.session.commit()
-    sendVerificationEmail(new_user.id)
+    send_verification_email(new_user.id)
     #TODO: send notification to Statistics MS
     return user_schema.dump(new_user)
 
 
-def getRole(user_id):
+def get_role(user_id):
     found_user = db.session.query(User).get(user_id)
     if found_user:
-        return {'isAdmin': found_user.is_admin}
+        return {'is_admin': found_user.is_admin}
     else:
-        return {'error': '{} not found'.format(user_id)}, 404
+        return 404
 
 
-def getUserDetails(user_id):
+def get_user_details(user_id):
     found_user = db.session.query(User).get(user_id)
     if found_user:
         return user_schema.dump(found_user)
     else:
-        return {'error': '{} not found'.format(user_id)}, 404
+        return 404
 
 
-def getUserImages(user_id):
+def get_user_images(user_id):
     found_user = db.session.query(User).get(user_id)
     if found_user:
         images = db.session.query(Image).filter_by(user_id=user_id).all()
-        json_images = []
-        for i in images:
-            json_images.append({'id': i.id, 'link': i.link, 'is_profile': i.is_profile})
-        print(json_images)
-        return {'images': json_images}
+        return image_schema.dump(images, many=True)
     else:
-        return {'error': '{} not found'.format(user_id)}, 404
+        return 404
 
 
-def addImageToUser(image_body):
+def add_image_to_user(image_body):
     found_user = db.session.query(User).get(image_body['user_id'])
     if found_user:
-        image = Image(link=image_body['imageLink'], is_profile=image_body['isProfile'], user_id=image_body['user_id'])
+        image = Image(link=image_body['image_link'], is_profile=image_body['is_profile'], user_id=image_body['user_id'])
         db.session.add(image)
         db.session.commit()
         images = db.session.query(Image).filter_by(user_id=image_body['user_id']).all()
@@ -200,106 +178,102 @@ def addImageToUser(image_body):
                 if i.id != image.id:
                     i.is_profile = False
                     db.session.commit()
-        json_images = []
-        for i in images:
-            json_images.append({'id': i.id, 'link': i.link, 'is_profile': i.is_profile})
-        print(json_images)
-        return {'images': json_images}
+        return image_schema.dump(images, many=True)
     else:
-        return {'error': '{} not found'.format(user_id)}, 404
+        return 404
 
 
-def changePassword(password_body):
+def change_password(password_body):
     found_user = db.session.query(User).get(password_body['user_id'])
     if found_user:
-        if bcrypt.check_password_hash(found_user.password, password_body['oldPassword']):
-            found_user.password = bcrypt.generate_password_hash(password_body['newPassword'])
+        if bcrypt.check_password_hash(found_user.password, password_body['old_password']):
+            found_user.password = bcrypt.generate_password_hash(password_body['new_password'])
             db.session.commit()
             return user_schema.dump(found_user)
         else:
-            return {'error': '{} passwords do not match'.format(user_body['username'])}, 400
+            return 400
     else:
-        return {'error': '{} not found'.format(password_body['user_id'])}, 404
+        return 404
 
-def changePhone(phone_body):
+def change_phone(phone_body):
     found_user = db.session.query(User).get(phone_body['user_id'])
     if found_user:
         found_user.phone = phone_body['phone']
         db.session.commit()
         return user_schema.dump(found_user)
     else:
-        return {'error': '{} not found'.format(phone_body['user_id'])}, 404
+        return 404
 
 
-def changeCity(city_body):
+def change_city(city_body):
     found_user = db.session.query(User).get(city_body['user_id'])
     if found_user:
         found_user.city = city_body['city']
         db.session.commit()
         return user_schema.dump(found_user)
     else:
-        return {'error': '{} not found'.format(city_body['user_id'])}, 404
+        return 404
 
 
-def changeCountry(country_body):
+def change_country(country_body):
     found_user = db.session.query(User).get(country_body['user_id'])
     if found_user:
         found_user.country = country_body['country']
         db.session.commit()
         return user_schema.dump(found_user)
     else:
-        return {'error': '{} not found'.format(country_body['user_id'])}, 404
+        return 404
 
 
-def changeAddress(address_body):
+def change_address(address_body):
     found_user = db.session.query(User).get(address_body['user_id'])
     if found_user:
         found_user.address = address_body['address']
         db.session.commit()
         return user_schema.dump(found_user)
     else:
-        return {'error': '{} not found'.format(address_body['user_id'])}, 404
+        return 404
 
 
-def changePostalCode(postal_body):
+def change_postal_code(postal_body):
     found_user = db.session.query(User).get(postal_body['user_id'])
     if found_user:
-        found_user.postal_code = postal_body['postalCode']
+        found_user.postal_code = postal_body['postal_code']
         db.session.commit()
         return user_schema.dump(found_user)
     else:
-        return {'error': '{} not found'.format(postal_body['user_id'])}, 404
+        return 404
 
 
-def verifyUser(verification_body):
+def verify_user(verification_body):
     found_user = db.session.query(User).get(verification_body['user_id'])
     if found_user:
         if found_user.verification_code == verification_body['code']:
             found_user.is_verified = True
             db.session.commit()
-            return {'message': "Successfully verified!"}
+            return 200
         else:
-            return {'error': '{} codes do not match'.format(found_user.username)}, 400
+            return 400
     else:
-        return {'error': '{} not found'.format(verification_body['user_id'])}, 404
+        return 404
 
 
-def getAllUsers():
+def get_all_users():
     users = db.session.query(User).all()
-    users_json = []
-    for user in users:
-        users_json.append(user_schema.dump(user))
-    return users_json
+    return user_schema.dump(users,many=True)
 
 
-def deleteUser(user_id):
+def delete_user(user_id):
+    user_images = db.session.query(Image).filter_by(user_id=user_id).all()
+    for i in user_images:
+        delete_image(i.id)
     db.session.query(User).filter_by(id=user_id).delete()
-    return {'message': 'User successfully deleted'}, 200
+    db.session.commit()
 
 
-def deleteImage(image_id):
+def delete_image(image_id):
     db.session.query(Image).filter_by(id=image_id).delete()
-    return {'message': 'Image successfully deleted'}, 200
+    db.session.commit()
 
 
 connexion_app = connexion.App(__name__, specification_dir="./")
@@ -324,8 +298,9 @@ mail = Mail(app)
 # dummy reference for migrations only
 from models import User, Image, UserSchema, ImageSchema
 
-user_schema = UserSchema()
+
 image_schema = ImageSchema()
+user_schema = UserSchema(exclude=['is_verified', 'password', 'verification_code'])
 
 
 if __name__ == "__main__":
