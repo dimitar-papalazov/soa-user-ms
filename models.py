@@ -1,5 +1,5 @@
 from app import db
-
+from marshmallow_sqlalcemy import SQLAlchemyAutoSchemas
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -29,3 +29,27 @@ class Image(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship("User")
     is_profile = db.Column(db.Boolean, nullable=False)
+
+class UserSchema(SQLAlchemyAutoSchemas):
+    class Meta:
+        model = User
+        load_instance = True
+    id = auto_field()
+    username = auto_field()
+    email = auto_field()
+    name = auto_field()
+    surname = auto_field()d()
+    gender = auto_field()
+    age = auto_field()
+    phone = auto_field()
+    city= auto_field()
+    country= auto_field()
+    address= auto_field()
+    postalCode= auto_field()
+    isAdmin= auto_field()
+    dateOfBirth= auto_field()
+
+class ImageSchema(SQLAlchemyAutoSchemas):
+    class Meta:
+        model = Image
+        load_instance = True

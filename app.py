@@ -11,6 +11,7 @@ import secrets
 import string
 import jwt
 import time
+from marshmallow_sqlalcemy import SQLAlchemyAutoSchemas
 
 
 JWT_SECRET = 'USER MS SECRET'

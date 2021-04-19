@@ -5,3 +5,4 @@ sqlalchemy
 flask-bcrypt
 Flask-Mail
 PyJWT
+flask-marshmallow_sqlalcemy
