@@ -1,13 +1,18 @@
 swagger: '2.0'
+
 info:
   title: User MS
   version: "0.3"
   description: USER MicroService
+  
 consumes:
   - application/json
+
 produces:
   - application/json
+
 basePath: "/api/user"
+
 securityDefinitions:
   jwt:
     type: apiKey
@@ -15,6 +20,7 @@ securityDefinitions:
     in: header
     x-authentication-scheme: Bearer
     x-bearerInfoFunc: app.decode_token
+
 paths:
   /auth:
     post:
@@ -28,7 +34,7 @@ paths:
         401:
           description: Bad auth
 
-  /registration/:
+  /registration:
     post:
       tags: [ User ]
       operationId: app.registration
@@ -43,7 +49,7 @@ paths:
   /role/{user_id}:
     get:
       tags: [User]
-      operationId: app.getRole
+      operationId: app.get_role
       parameters:
         - $ref: '#/parameters/user_id'
       responses:
@@ -51,10 +57,11 @@ paths:
           description: Return user role
         404:
           description: User not found
+
   /details/{user_id}:
     get:
       tags: [User]
-      operationId: app.getUserDetails
+      operationId: app.get_user_details
       parameters:
         - $ref: '#/parameters/user_id'
       responses:
@@ -62,10 +69,11 @@ paths:
           description: Return user details
         404:
           description: User not found
+
   /send-email/{user_id}:
     post:
-      tags: [User]
-      operationId: app.sendVerificationEmail
+      tags: [Email]
+      operationId: app.send_verification_email
       parameters:
         - $ref: '#/parameters/user_id'
       responses:
@@ -73,10 +81,11 @@ paths:
           description: Return successfully sent
         404:
           description: User not found
-  /verify/:
+
+  /verify:
     put:
       tags: [User]
-      operationId: app.verifyUser
+      operationId: app.verify_user
       parameters:
         - $ref: '#/parameters/verification_body'
       responses:
@@ -86,10 +95,11 @@ paths:
           description: Codes do not match
         404:
           description: User not found
+
   /images/{user_id}:
     get:
       tags: [Image]
-      operationId: app.getUserImages
+      operationId: app.get_user_images
       parameters:
         - $ref: '#/parameters/user_id'
       responses:
@@ -97,10 +107,11 @@ paths:
           description: Return user images
         404:
           description: User not found
+
   /add-image:
     post:
       tags: [Image]
-      operationId: app.addImageToUser
+      operationId: app.add_image_to_user
       parameters:
         - $ref: '#/parameters/image_body'
       responses:
@@ -108,10 +119,11 @@ paths:
           description: Added image to user
         404:
           description: Image not added
+
   /change-password:
     put:
       tags: [User]
-      operationId: app.changePassword
+      operationId: app.change_password
       parameters:
         - $ref: '#/parameters/password_body'
       responses:
@@ -119,10 +131,11 @@ paths:
           description: Changed password successfully
         404:
           description: Password not changed
+
   /change-phone:
     put:
       tags: [User]
-      operationId: app.changePhone
+      operationId: app.change_phone
       parameters:
         - $ref: '#/parameters/phone_body'
       responses:
@@ -130,10 +143,11 @@ paths:
           description: Changed phone successfully
         404:
           description: Phone not changed
+
   /change-city:
     put:
       tags: [User]
-      operationId: app.changeCity
+      operationId: app.change_city
       parameters:
         - $ref: '#/parameters/city_body'
       responses:
@@ -141,10 +155,11 @@ paths:
           description: Changed city successfully
         404:
           description: City not changed
+
   /change-country:
     put:
       tags: [User]
-      operationId: app.changeCountry
+      operationId: app.change_country
       parameters:
         - $ref: '#/parameters/country_body'
       responses:
@@ -152,10 +167,11 @@ paths:
           description: Country changed successfully
         404:
           description: Country not changed
+
   /change-address:
     put:
       tags: [User]
-      operationId: app.changeAddress
+      operationId: app.change_address
       parameters:
         - $ref: '#/parameters/address_body'
       responses:
@@ -163,10 +179,11 @@ paths:
           description: Address changed successfully
         404:
           description: Address not changed
+
   /change-postal:
     put:
       tags: [User]
-      operationId: app.changePostalCode
+      operationId: app.change_postal_code
       parameters:
         - $ref: '#/parameters/postal_body'
       responses:
@@ -174,34 +191,37 @@ paths:
           description: Postal code changed successfully
         404:
           description: Postal code not changed
+
   /all:
     get:
       tags: [User]
-      operationId: app.getAllUsers
+      operationId: app.get_all_users
       responses:
         200:
           description: Returns all users details
-        500:
-          description: Server error
+        404:
+          description: Images were not found
+
   /delete/{user_id}:
     delete:
       tags: [User]
-      operationId: app.deleteUser
+      operationId: app.delete_user
       parameters:
         - $ref: '#/parameters/user_id'
       responses:
-        200:
+        204:
           description: User successfully deleted
         404:
           description: User not found
+
   /delete-image/{image_id}:
     delete:
       tags: [Image]
-      operationId: app.deleteImage
+      operationId: app.delete_image
       parameters:
         - $ref: '#/parameters/image_id'
       responses:
-        200:
+        204:
           description: Image successfully deleted
         404:
           description: Image not found
@@ -209,7 +229,7 @@ paths:
 parameters:
   auth_body:
     name: auth_body
-    description: Login and get token
+    description: Body of login and get token request
     in: body
     schema:
       required:
@@ -220,9 +240,10 @@ parameters:
           type: string
         password:
           type: string
+
   user_body:
     name: user_body
-    description: Body of a user
+    description: Body of a user add request
     in: body
     schema:
       required:
@@ -231,8 +252,8 @@ parameters:
         - surname
         - email
         - password
-        - repeatedPassword
-        - dateOfBirth
+        - repeated_password
+        - date_of_birth
         - gender
       properties:
         username:
@@ -245,12 +266,13 @@ parameters:
           type: string
         password:
           type: string
-        repeatedPassword:
+        repeated_password:
           type: string
-        dateOfBirth:
+        date_of_birth:
           type: string
         gender:
           type: string
+
   user_id:
     name: user_id
     description: User unique id
@@ -267,41 +289,41 @@ parameters:
 
   image_body:
     name: image_body
-    description: Body of a image
+    description: Body of a image add request
     in: body
     schema:
       required:
         - user_id
-        - imageLink
-        - isProfile
+        - image_link
+        - is_profile
       properties:
         user_id:
           type: integer
-        imageLink:
+        image_link:
           type: string
-        isProfile:
+        is_profile:
           type: boolean
 
   password_body:
     name: password_body
-    description: Body of a password
+    description: Body of a password update request
     in: body
     schema:
       required:
         - user_id
-        - newPassword
-        - oldPassword
+        - new_password
+        - old_password
       properties:
         user_id:
           type: integer
-        newPassword:
+        new_password:
           type: string
-        oldPassword:
+        old_password:
           type: string
 
   phone_body:
     name: phone_body
-    description: Body of a phone
+    description: Body of a phone update request
     in: body
     schema:
       required:
@@ -315,7 +337,7 @@ parameters:
 
   city_body:
     name: city_body
-    description: Body of a city
+    description: Body of a city update request
     in: body
     schema:
       required:
@@ -329,7 +351,7 @@ parameters:
 
   country_body:
     name: country_body
-    description: Body of a country
+    description: Body of a country update request
     in: body
     schema:
       required:
@@ -343,7 +365,7 @@ parameters:
 
   address_body:
     name: address_body
-    description: Body of an address
+    description: Body of an address update request
     in: body
     schema:
       required:
@@ -357,21 +379,21 @@ parameters:
 
   postal_body:
     name: postal_body
-    description: Body of a postalCode
+    description: Body of a postal_code update request
     in: body
     schema:
       required:
         - user_id
-        - postalCode
+        - postal_code
       properties:
         user_id:
           type: integer
-        postalCode:
+        postal_code:
           type: integer
 
   verification_body:
     name: verification_body
-    description: Body of a verificaiton
+    description: Body of a verificaiton update request
     in: body
     schema:
       required:
