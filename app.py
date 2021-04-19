@@ -1,4 +1,6 @@
+from functools import wraps
 import connexion
+from flask import request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -50,14 +52,6 @@ def has_role(arg):
     return has_role_inner
 
 
-# @has_role(['invoice', 'shipping'])
-# def get_test1(test1_id):
-#     data = request.data
-#     headers = request.headers
-#     # token = headers['HTTP_AUTHORIZATION']
-#     return {'id': 1, 'name': 'name', 'entered_id': test1_id}
-
-
 def auth(auth_body):
     timestamp = int(time.time())
     found_user = db.session.query(User).filter_by(username=auth_body['username']).first()
@@ -65,6 +59,8 @@ def auth(auth_body):
     roles = []
     if found_user.is_admin:
         roles.append("admin")
+    else:
+        roles.append("basic_user")
     payload = {
         "iss": 'User Microservice',
         "iat": int(timestamp),
@@ -77,26 +73,50 @@ def auth(auth_body):
     return encoded
 
 
-# def auth_microservice(auth_body_microservice):
-#     apikey = auth_body_microservice['apikey']
+def auth_microservice(auth_body_microservice):
+    apikey = auth_body_microservice['apikey']
+    roles = []        
+    if apikey == INVENTORY_APIKEY:
+        roles.append("inventory")
+        sub = 'inventory'
+    elif apikey == PAYMENTS_APIKEY:
+        roles.append("payments")
+        sub = 'payments'
+    elif apikey == INVOICES_APIKEY:
+        roles.append("invoices")
+        sub = 'invoices'
+    elif apikey == SHIPPING_APIKEY:
+        roles.append("shipping")
+        sub = 'shipping'
+    elif apikey == SHOPPING_CART_APIKEY:
+        roles.append("shopping_cart")
+        sub = 'shopping_cart'
+    elif apikey == DISCOUNTS_APIKEY:
+        roles.append("discounts")
+        sub = 'discounts'
+    elif apikey == STATISTICS_APIKEY:
+        roles.append("statistics")
+        sub = 'statistics'
+    elif apikey == LOCATIONS_APIKEY:
+        roles.append("locations")
+        sub = 'locations'
+    elif apikey == RESERVE_APIKEY:
+        roles.append("reserve")
+        sub = 'reserve'
+    elif apikey == SOCIAL_APIKEY:
+        roles.append("social")
+        sub = 'social'
 
-#     if apikey == INVOICE_APIKEY:
-#         roles = ['invoice']
-#         sub = 'invoice'
-#     elif apikey == SHIPPING_APIKEY:
-#         roles = ['shipping', 'editing']
-#         sub = 'shipping'
-
-#     timestamp = int(time.time())
-#     payload = {
-#         "iss": 'my app',
-#         "iat": int(timestamp),
-#         "exp": int(timestamp + JWT_LIFETIME_SECONDS),
-#         "sub": sub,
-#         "roles": roles
-#     }
-#     encoded = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
-#     return encoded
+    timestamp = int(time.time())
+    payload = {
+        "iss": 'my app',
+        "iat": int(timestamp),
+        "exp": int(timestamp + JWT_LIFETIME_SECONDS),
+        "sub": sub,
+        "roles": roles
+    }
+    encoded = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    return encoded
 
 
 def decode_token(token):
@@ -104,6 +124,7 @@ def decode_token(token):
 
 
 #endpoints
+@has_role(["admin"])
 def send_verification_email(user_id):
   found_user = db.session.query(User).get(user_id)
   if found_user:
@@ -157,6 +178,7 @@ def get_user_details(user_id):
         return 404
 
 
+@has_role(["admin", "social"])
 def get_user_images(user_id):
     found_user = db.session.query(User).get(user_id)
     if found_user:
@@ -166,6 +188,7 @@ def get_user_images(user_id):
         return 404
 
 
+@has_role(["admin", "social"])
 def add_image_to_user(image_body):
     found_user = db.session.query(User).get(image_body['user_id'])
     if found_user:
@@ -183,6 +206,7 @@ def add_image_to_user(image_body):
         return 404
 
 
+@has_role(["admin", "basic_user"])
 def change_password(password_body):
     found_user = db.session.query(User).get(password_body['user_id'])
     if found_user:
@@ -195,6 +219,8 @@ def change_password(password_body):
     else:
         return 404
 
+
+@has_role(["admin", "basic_user"])
 def change_phone(phone_body):
     found_user = db.session.query(User).get(phone_body['user_id'])
     if found_user:
@@ -205,6 +231,7 @@ def change_phone(phone_body):
         return 404
 
 
+@has_role(["admin", "basic_user"])
 def change_city(city_body):
     found_user = db.session.query(User).get(city_body['user_id'])
     if found_user:
@@ -215,6 +242,7 @@ def change_city(city_body):
         return 404
 
 
+@has_role(["admin", "basic_user"])
 def change_country(country_body):
     found_user = db.session.query(User).get(country_body['user_id'])
     if found_user:
@@ -225,6 +253,7 @@ def change_country(country_body):
         return 404
 
 
+@has_role(["admin", "basic_user"])
 def change_address(address_body):
     found_user = db.session.query(User).get(address_body['user_id'])
     if found_user:
@@ -235,6 +264,7 @@ def change_address(address_body):
         return 404
 
 
+@has_role(["admin", "basic_user"])
 def change_postal_code(postal_body):
     found_user = db.session.query(User).get(postal_body['user_id'])
     if found_user:
@@ -245,6 +275,7 @@ def change_postal_code(postal_body):
         return 404
 
 
+@has_role(["admin", "basic_user"])
 def verify_user(verification_body):
     found_user = db.session.query(User).get(verification_body['user_id'])
     if found_user:
@@ -263,6 +294,7 @@ def get_all_users():
     return user_schema.dump(users,many=True)
 
 
+@has_role(["admin"])
 def delete_user(user_id):
     user_images = db.session.query(Image).filter_by(user_id=user_id).all()
     for i in user_images:
@@ -271,6 +303,7 @@ def delete_user(user_id):
     db.session.commit()
 
 
+@has_role(["admin"])
 def delete_image(image_id):
     db.session.query(Image).filter_by(id=image_id).delete()
     db.session.commit()
