@@ -6,7 +6,6 @@
 - activate environment ( $ source venv/bin/activate )
 - install packages ( $ pip install -r requirements.txt )
 - export flask app ( $ export FLASK_APP=app.py )
-
 ## SQL Alchemy migrations
 
 - Init (first time only)
