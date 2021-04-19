@@ -11,7 +11,6 @@ import secrets
 import string
 import jwt
 import time
-from marshmallow_sqlalcemy import SQLAlchemyAutoSchemas
 
 
 JWT_SECRET = 'USER MS SECRET'
@@ -172,7 +171,7 @@ def getRole(user_id):
 def getUserDetails(user_id):
     found_user = db.session.query(User).get(user_id)
     if found_user:
-        return user_to_json(found_user)
+        return user_schema.dump(found_user)
     else:
         return {'error': '{} not found'.format(user_id)}, 404
 
@@ -324,7 +323,10 @@ mail = Mail(app)
 
 
 # dummy reference for migrations only
-from models import User, Image
+from models import User, Image, UserSchema, ImageSchema
+
+user_schema = UserSchema()
+image_schema = ImageSchema()
 
 
 if __name__ == "__main__":
