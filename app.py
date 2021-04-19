@@ -299,8 +299,8 @@ mail = Mail(app)
 from models import User, Image, UserSchema, ImageSchema
 
 
-user_schema = UserSchema(exclude=['is_verified', 'password', 'verification_code'])
 image_schema = ImageSchema()
+user_schema = UserSchema(exclude=['is_verified', 'password', 'verification_code'])
 
 
 if __name__ == "__main__":

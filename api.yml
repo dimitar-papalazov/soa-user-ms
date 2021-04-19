@@ -202,6 +202,18 @@ paths:
         404:
           description: Images were not found
 
+  /delete-image/{image_id}:
+    delete:
+      tags: [Image]
+      operationId: app.delete_image
+      parameters:
+        - $ref: '#/parameters/image_id'
+      responses:
+        204:
+          description: Image successfully deleted
+        404:
+          description: Image not found        
+
   /delete/{user_id}:
     delete:
       tags: [User]
@@ -213,18 +225,6 @@ paths:
           description: User successfully deleted
         404:
           description: User not found
-
-  /delete-image/{image_id}:
-    delete:
-      tags: [Image]
-      operationId: app.delete_image
-      parameters:
-        - $ref: '#/parameters/image_id'
-      responses:
-        204:
-          description: Image successfully deleted
-        404:
-          description: Image not found
 
 parameters:
   auth_body:
