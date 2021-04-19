@@ -9,6 +9,90 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 import secrets
 import string
+import jwt
+import time
+
+
+JWT_SECRET = 'USER MS SECRET'
+JWT_LIFETIME_SECONDS = 600000
+
+# INVOICE_APIKEY = '123abc'
+# SHIPPING_APIKEY = 'abc321'
+
+
+def has_role(arg):
+    def has_role_inner(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            try:
+                headers = request.headers
+                if 'AUTHORIZATION' in headers:
+                    token = headers['AUTHORIZATION'].split(' ')[1]
+                    decoded_token = decode_token(token)
+                    if 'admin' in decoded_token['roles']:
+                        return fn(*args, **kwargs)
+                    for role in arg:
+                        if role in decoded_token['roles']:
+                            return fn(*args, **kwargs)
+                    abort(401)
+                return fn(*args, **kwargs)
+            except Exception as e:
+                abort(401)
+        return decorated_view
+    return has_role_inner
+
+
+# @has_role(['invoice', 'shipping'])
+# def get_test1(test1_id):
+#     data = request.data
+#     headers = request.headers
+#     # token = headers['HTTP_AUTHORIZATION']
+#     return {'id': 1, 'name': 'name', 'entered_id': test1_id}
+
+
+def auth(auth_body):
+    timestamp = int(time.time())
+    found_user = db.session.query(User).filter_by(username=auth_body['username']).first()
+    user_id = found_user.id
+    roles = []
+    if found_user.is_admin:
+        roles.append("admin")
+    payload = {
+        "iss": 'User Microservice',
+        "iat": int(timestamp),
+        "exp": int(timestamp + JWT_LIFETIME_SECONDS),
+        "sub": user_id,
+        "roles": roles,
+        "user-details": user_to_json(found_user)
+    }
+    encoded = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    return encoded
+
+
+# def auth_microservice(auth_body_microservice):
+#     apikey = auth_body_microservice['apikey']
+
+#     if apikey == INVOICE_APIKEY:
+#         roles = ['invoice']
+#         sub = 'invoice'
+#     elif apikey == SHIPPING_APIKEY:
+#         roles = ['shipping', 'editing']
+#         sub = 'shipping'
+
+#     timestamp = int(time.time())
+#     payload = {
+#         "iss": 'my app',
+#         "iat": int(timestamp),
+#         "exp": int(timestamp + JWT_LIFETIME_SECONDS),
+#         "sub": sub,
+#         "roles": roles
+#     }
+#     encoded = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+#     return encoded
+
+
+def decode_token(token):
+    return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
 
 
 def user_to_json(user):

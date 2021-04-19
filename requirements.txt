@@ -4,3 +4,4 @@ connexion[swagger-ui]
 sqlalchemy
 flask-bcrypt
 Flask-Mail
+PyJWT
