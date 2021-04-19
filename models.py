@@ -42,12 +42,12 @@ class UserSchema(SQLAlchemyAutoSchema):
     gender = auto_field()
     age = auto_field()
     phone = auto_field()
-    city= auto_field()
-    country= auto_field()
-    address= auto_field()
-    postal_code= auto_field()
-    is_admin= auto_field()
-    date_of_birth= auto_field()
+    city = auto_field()
+    countr = auto_field()
+    address = auto_field()
+    postal_code = auto_field()
+    is_admin = auto_field()
+    date_of_birth = auto_field()
 
 class ImageSchema(SQLAlchemyAutoSchema):
     class Meta:

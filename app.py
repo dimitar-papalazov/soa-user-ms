@@ -71,7 +71,7 @@ def auth(auth_body):
         "exp": int(timestamp + JWT_LIFETIME_SECONDS),
         "sub": user_id,
         "roles": roles,
-        "user-details": user_to_json(found_user)
+        "user-details": (found_user)
     }
     encoded = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return encoded
@@ -103,23 +103,22 @@ def decode_token(token):
     return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
 
 
-def user_to_json(user):
-    return {
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'name': user.name,
-        'surname': user.surname,
-        'gender': user.gender,
-        'age': user.age,
-        'phone': user.phone,
-        'city': user.city,
-        'country': user.country,
-        'address': user.address,
-        'postalCode': user.postal_code,
-        'isAdmin': user.is_admin,
-        'dateOfBirth': user.date_of_birth
-    }
+#def user_to_json(user):
+#    return {
+#        'id': user.id,
+#        'email': user.email,
+#        'name': user.name,
+#        'surname': user.surname,
+#        'gender': user.gender,
+#        'age': user.age,
+#        'phone': user.phone,
+#        'city': user.city,
+#        'country': user.country,
+#        'address': user.address,
+#        'postalCode': user.postal_code,
+#        'isAdmin': user.is_admin,
+#        'dateOfBirth': user.date_of_birth
+#    }
 
 
 #endpoints
@@ -157,7 +156,7 @@ def registration(user_body):
     db.session.commit()
     sendVerificationEmail(new_user.id)
     #TODO: send notification to Statistics MS
-    return user_to_json(new_user)
+    return user_schema.dump(new_user)
 
 
 def getRole(user_id):
@@ -216,7 +215,7 @@ def changePassword(password_body):
         if bcrypt.check_password_hash(found_user.password, password_body['oldPassword']):
             found_user.password = bcrypt.generate_password_hash(password_body['newPassword'])
             db.session.commit()
-            return user_to_json(found_user)
+            return user_schema.dump(found_user)
         else:
             return {'error': '{} passwords do not match'.format(user_body['username'])}, 400
     else:
@@ -227,7 +226,7 @@ def changePhone(phone_body):
     if found_user:
         found_user.phone = phone_body['phone']
         db.session.commit()
-        return user_to_json(found_user)
+        return user_schema.dump(found_user)
     else:
         return {'error': '{} not found'.format(phone_body['user_id'])}, 404
 
@@ -237,7 +236,7 @@ def changeCity(city_body):
     if found_user:
         found_user.city = city_body['city']
         db.session.commit()
-        return user_to_json(found_user)
+        return user_schema.dump(found_user)
     else:
         return {'error': '{} not found'.format(city_body['user_id'])}, 404
 
@@ -247,7 +246,7 @@ def changeCountry(country_body):
     if found_user:
         found_user.country = country_body['country']
         db.session.commit()
-        return user_to_json(found_user)
+        return user_schema.dump(found_user)
     else:
         return {'error': '{} not found'.format(country_body['user_id'])}, 404
 
@@ -257,7 +256,7 @@ def changeAddress(address_body):
     if found_user:
         found_user.address = address_body['address']
         db.session.commit()
-        return user_to_json(found_user)
+        return user_schema.dump(found_user)
     else:
         return {'error': '{} not found'.format(address_body['user_id'])}, 404
 
@@ -267,7 +266,7 @@ def changePostalCode(postal_body):
     if found_user:
         found_user.postal_code = postal_body['postalCode']
         db.session.commit()
-        return user_to_json(found_user)
+        return user_schema.dump(found_user)
     else:
         return {'error': '{} not found'.format(postal_body['user_id'])}, 404
 
@@ -289,7 +288,7 @@ def getAllUsers():
     users = db.session.query(User).all()
     users_json = []
     for user in users:
-        users_json.append(user_to_json(user))
+        users_json.append(user_schema.dump(user))
     return users_json
 
 
