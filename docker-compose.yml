@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:
+  
+  consul:
+    image: consul
+    container_name: consul
+    ports: 
+      - "8500:8500"
+
+  userms-api:
+    build:
+      context: .
+    image: userms:0.0.1
+    container_name: user-microservice
+    ports:
+      - "5000:5000"
