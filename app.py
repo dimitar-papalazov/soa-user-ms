@@ -16,6 +16,7 @@ import time
 from consul import Consul, Check
 import configparser
 import netifaces
+import socket
 
 JWT_SECRET = 'USER MS SECRET'
 JWT_LIFETIME_SECONDS = 600000
